@@ -5,6 +5,10 @@
 
 [English](README.md)
 
+![侧栏品牌行里的重启按钮](docs/restart-button.png)
+
+*重启按钮，就在「DeepSeek Harness」字样右侧。*
+
 > ### ⚠️ 必须先加一条 profile 补丁，按钮才会出现
 >
 > 侧栏品牌行是 **`single` 槽**，而 `dsh-client-ui-slots` 对 `single` 槽的**第二次注册会直接抛错**——
@@ -139,6 +143,27 @@ Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ Comma
 
 另外：杀进程用进程号直接 `process.kill()`，不再 spawn `taskkill`（少一个控制台进程，关键路径少约 1.1 秒）；
 重新拉起最多 **5 次**；全过程写入 `$DSH_HOME/.dsh-restart-button/restart.log`。
+
+## 一次真实重启长什么样
+
+下面是从 `$DSH_HOME/.dsh-restart-button/restart.log` 里原样抄出来的一次真实重启：
+
+```
+15:00:53.877 [primary] wmi create -> ReturnValue=0 pid=24172
+15:00:53.877 [primary] relaunch delegated to out-of-tree worker pid 24172
+15:00:53.919 [worker]  helper start pid=22748 port=19387 main=10192 host=20620
+15:00:55.079 [primary] kill main(10192)=true host(20620)=true
+15:00:55.141 [worker]  port 19387 free after 800ms
+15:00:55.159 [worker]  relaunch attempt 1/5: spawned pid=23248
+15:00:57.679 [worker]  app is listening on 19387 after 2535ms (attempt 1)
+15:00:57.690 [worker]  activation requested for pid 23248
+15:00:59.436 [activate] brought the window to the foreground
+```
+
+这个顺序本身就说明了整个设计：primary 在**杀掉任何东西之前**先造出树外 worker，
+下一行 worker 已经在运行；而它的 `port free` 出现在应用被终结**之后**——这恰恰是过去
+会失败的地方。从终止旧进程到窗口回到前台约 **5.5 秒**，其中 2.5 秒是 DeepSeek Harness
+自身的启动时间。
 
 ## 要求与限制
 

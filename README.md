@@ -6,6 +6,10 @@ in the sidebar brand row, next to *DeepSeek Harness*, plus an HTTP route so an a
 
 [中文说明](README.zh.md)
 
+![The restart button in the sidebar brand row](docs/restart-button.png)
+
+*The restart button, immediately right of the wordmark.*
+
 > ### ⚠️ One profile patch is required before the button appears
 >
 > The sidebar's brand row is a **`single` slot**, and `dsh-client-ui-slots` **throws** on
@@ -158,6 +162,29 @@ parent that exits immediately.
 It also kills by PID rather than shelling out to `taskkill` (one fewer console process,
 and ~1.1 s less on the critical path), caps relaunch attempts at **5**, and logs
 everything to `$DSH_HOME/.dsh-restart-button/restart.log`.
+
+## What a restart actually looks like
+
+One real restart on Windows, copied from `$DSH_HOME/.dsh-restart-button/restart.log`:
+
+```
+15:00:53.877 [primary] wmi create -> ReturnValue=0 pid=24172
+15:00:53.877 [primary] relaunch delegated to out-of-tree worker pid 24172
+15:00:53.919 [worker]  helper start pid=22748 port=19387 main=10192 host=20620
+15:00:55.079 [primary] kill main(10192)=true host(20620)=true
+15:00:55.141 [worker]  port 19387 free after 800ms
+15:00:55.159 [worker]  relaunch attempt 1/5: spawned pid=23248
+15:00:57.679 [worker]  app is listening on 19387 after 2535ms (attempt 1)
+15:00:57.690 [worker]  activation requested for pid 23248
+15:00:59.436 [activate] brought the window to the foreground
+```
+
+The whole design is visible in that ordering: the primary creates the out-of-tree worker
+*before* killing anything, the worker is already running on the next line, and its
+`port free` line comes **after** the application was terminated — which is precisely what
+used to fail. From terminating the old process to the window being back in the
+foreground takes about **5.5 seconds**, of which 2.5 seconds is DeepSeek Harness's own
+startup.
 
 ## Requirements and limitations
 
