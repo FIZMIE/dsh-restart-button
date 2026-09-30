@@ -6,6 +6,17 @@ in the sidebar brand row, next to *DeepSeek Harness*, plus an HTTP route so an a
 
 [中文说明](README.zh.md)
 
+> ### ⚠️ One profile patch is required before the button appears
+>
+> The sidebar's brand row is a **`single` slot**, and `dsh-client-ui-slots` **throws** on
+> a second registration for a `single` slot — so the shipped
+> `@deepseek-ai/dsh-client-ui-brand-official` occupant has to step aside first.
+>
+> **Without it the plugin installs and its HTTP routes work, but the button never shows.**
+>
+> Append [`install/profile-patch.yml`](install/profile-patch.yml) to
+> `$DSH_HOME/profiles/<profile>/cordis.patch.yml` — see [Install](#install).
+
 ---
 
 ## The problem
@@ -48,6 +59,9 @@ Append to `$DSH_HOME/profiles/<profile>/cordis.patch.yml`:
   name: "@deepseek-ai/dsh-client-ui-brand-official"
   disabled: true
 ```
+
+The same lines, with the full rationale and the revert instructions, are available as
+a copy-paste fragment: [`install/profile-patch.yml`](install/profile-patch.yml).
 
 (`ui-brand-official` is the row id declared in `@deepseek-ai/dsh-web-app/cordis.patch.yml`.)
 

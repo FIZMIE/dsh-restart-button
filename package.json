@@ -24,6 +24,7 @@
     "lib",
     "client",
     "cordis.patch.yml",
+    "install",
     "tools",
     "README.md",
     "README.zh.md",

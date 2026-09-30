@@ -1,0 +1,38 @@
+# dsh-restart-button — required profile patch
+#
+# APPEND these lines to your profile's patch file:
+#
+#     $DSH_HOME/profiles/<profile>/cordis.patch.yml
+#
+# Do NOT confuse this with the plugin's own bundle patch (`cordis.patch.yml` at the
+# repository root, referenced by `dsh.bundle.patch`). The profile patch is a
+# user-owned layer applied after every bundle layer; this row is a *disable* of a
+# shipped row and belongs to your profile, not to the plugin.
+#
+# Why it is required
+# ------------------
+# DeepSeek Harness's sidebar exposes 7 render targets. Only `sidebar.panellist` is a
+# `list` slot; the rest are `single` slots, and dsh-client-ui-slots throws on a second
+# registration for a `single` slot:
+#
+#     single slot "<name>" already has a registration ...
+#
+# The brand row therefore belongs to the shipped @deepseek-ai/dsh-client-ui-brand-official,
+# which has to step aside before the restart button can occupy
+# `sidebar.brand.name`. The sidebar documents this as a supported deployment choice
+# ("a deployment can replace the brand mark or name"), and dsh-restart-button
+# re-renders the official wordmark itself, so the title looks unchanged. The fish mark
+# falls back to the sidebar's own FishLogo, which is the same component the official
+# occupant used.
+#
+# If you skip this, the plugin still installs and its HTTP routes still work — the
+# button just never appears.
+#
+# To revert
+# ---------
+# Set `disabled: false`, or delete the three lines below. The official brand returns
+# and the restart button disappears from the brand row.
+
+- id: ui-brand-official
+  name: "@deepseek-ai/dsh-client-ui-brand-official"
+  disabled: true

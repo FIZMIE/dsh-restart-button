@@ -5,6 +5,16 @@
 
 [English](README.md)
 
+> ### ⚠️ 必须先加一条 profile 补丁，按钮才会出现
+>
+> 侧栏品牌行是 **`single` 槽**，而 `dsh-client-ui-slots` 对 `single` 槽的**第二次注册会直接抛错**——
+> 所以必须让随附的 `@deepseek-ai/dsh-client-ui-brand-official` 先让位。
+>
+> **不加这条：插件能装、HTTP 接口也能用，但按钮不会出现。**
+>
+> 把 [`install/profile-patch.yml`](install/profile-patch.yml) 追加到
+> `$DSH_HOME/profiles/<profile>/cordis.patch.yml`——详见[安装](#安装)。
+
 ---
 
 ## 为什么需要它
