@@ -19,28 +19,24 @@
 
 于是每次装插件或改配置需要新进程时，都得*托盘退出 → 找图标 → 再启动*。这个插件补上那个按钮。
 
+## 环境要求
+
+| | |
+|---|---|
+| **系统** | Windows（树外 worker 依赖 WMI、`wscript.exe` 和 Win32 取前台） |
+| **宿主** | DeepSeek Harness `0.2.0-rc.2` 桌面版 |
+| **profile 补丁** | **必需**——一条 `disabled: true`，见下面的第 1 步。不加这条，插件能装但按钮不会出现。 |
+
 ## 安装
 
-DSH 插件就是一个普通的 profile bundle，两种方式都行：
-
-```powershell
-# 从本仓库安装
-dsh plugin --profile desktop add git+https://github.com/<owner>/dsh-restart-button.git
-
-# 或从本地目录安装
-dsh plugin --profile desktop add C:\path\to\dsh-restart-button
-```
-
-然后**刷新页面**即可——浏览器半区的变化由 `dsh-client-modules` 增量扫描，不需要重启进程。
-
-### 需要改一处 profile 补丁
+### 1. 先加 profile 补丁（必需）
 
 侧栏的 7 个渲染位几乎都是 `single` 槽，而 slot 注册表对 `single` 槽的**第二次注册会直接抛错**
 （`dsh-client-ui-slots`：`single slot "<name>" already has a registration`）。品牌行归随附的
 `@deepseek-ai/dsh-client-ui-brand-official` 所有，所以它必须让位。侧栏自己的文档把这件事写成受支持的用法——
-*"部署可以替换品牌标记或名称"*——而本插件会重新渲染官方 wordmark，标题不会变。
+*"部署可以替换品牌标记或名称"*——而本插件会重新渲染官方 wordmark，标题看起来不变。
 
-在 `$DSH_HOME/profiles/<profile>/cordis.patch.yml` 里加：
+在 `$DSH_HOME/profiles/<profile>/cordis.patch.yml` 末尾追加：
 
 ```yaml
 - id: ui-brand-official
@@ -50,7 +46,22 @@ dsh plugin --profile desktop add C:\path\to\dsh-restart-button
 
 （`ui-brand-official` 是 `@deepseek-ai/dsh-web-app/cordis.patch.yml` 里声明的行 id。）
 
-不加这条插件也能装，只是按钮不出现——早期版本还有一个侧栏入口，后来因为和按钮功能重复被删掉了。
+### 2. 安装 bundle
+
+DSH 插件就是一个普通的 profile bundle，两种方式都行：
+
+```powershell
+# 从本仓库安装
+dsh plugin --profile desktop add git+https://github.com/FIZMIE/dsh-restart-button.git
+
+# 或从本地目录安装
+dsh plugin --profile desktop add C:\path\to\dsh-restart-button
+```
+
+### 3. 刷新页面
+
+浏览器半区的变化由 `dsh-client-modules` 增量扫描，不需要重启进程——刷新一下即可。
+按钮会出现在「DeepSeek Harness」字样右侧。
 
 ## 你会得到
 

@@ -21,32 +21,27 @@ The packaged DeepSeek Harness desktop build has **no way to restart itself**:
 So every plugin install or configuration change that needs a fresh process means
 *quit from the tray → find the icon → launch again*. This plugin adds the missing button.
 
+## Requirements
+
+| | |
+|---|---|
+| **OS** | Windows (the restart worker uses WMI, `wscript.exe` and Win32 foreground activation) |
+| **Host** | DeepSeek Harness `0.2.0-rc.2` desktop build |
+| **Profile patch** | **Required** — one `disabled: true` row, see step 1 below. Without it the plugin installs but the button never appears. |
+
 ## Install
 
-A DSH plugin is an ordinary profile bundle, so either of these works:
-
-```powershell
-# from this repository (or a local checkout)
-dsh plugin --profile desktop add git+https://github.com/<owner>/dsh-restart-button.git
-
-# from a local directory
-dsh plugin --profile desktop add C:\path\to\dsh-restart-button
-```
-
-Then **refresh the page** — client changes are picked up by `dsh-client-modules`
-without a process restart.
-
-### One profile patch is required
+### 1. Add the profile patch (required — do this first)
 
 The sidebar's 7 render targets are almost all `single` slots, and the slot registry
 **throws on a second registration** for a `single` slot
 (`dsh-client-ui-slots`: `single slot "<name>" already has a registration`).
 The brand row is owned by the shipped `@deepseek-ai/dsh-client-ui-brand-official`, so
-that occupant has to step aside. The sidebar itself documents this as supported —
-*"a deployment can replace the brand mark or name"* — and the plugin re-renders the
-official wordmark, so the title is unchanged.
+that occupant has to step aside. The sidebar itself documents that as supported —
+*"a deployment can replace the brand mark or name"* — and this plugin re-renders the
+official wordmark, so the title looks unchanged.
 
-Add this to `$DSH_HOME/profiles/<profile>/cordis.patch.yml`:
+Append to `$DSH_HOME/profiles/<profile>/cordis.patch.yml`:
 
 ```yaml
 - id: ui-brand-official
@@ -56,14 +51,29 @@ Add this to `$DSH_HOME/profiles/<profile>/cordis.patch.yml`:
 
 (`ui-brand-official` is the row id declared in `@deepseek-ai/dsh-web-app/cordis.patch.yml`.)
 
-Without it the plugin still installs; the button just does not appear, and the sidebar
-entry that used to exist was removed in favour of the single button.
+### 2. Add the bundle
+
+A DSH plugin is an ordinary profile bundle, so either of these works:
+
+```powershell
+# from this repository
+dsh plugin --profile desktop add git+https://github.com/FIZMIE/dsh-restart-button.git
+
+# from a local checkout
+dsh plugin --profile desktop add C:\path\to\dsh-restart-button
+```
+
+### 3. Refresh the page
+
+Client changes are picked up by `dsh-client-modules` without a process restart, so a
+browser refresh is enough. The button appears immediately right of the
+*DeepSeek Harness* wordmark.
 
 ## What you get
 
-- **Brand-row button** — a refresh glyph immediately right of the *DeepSeek Harness*
-  wordmark. Click it, confirm, and the whole application restarts: the window
-  disappears, comes back by itself, is brought to the foreground, and the page reloads.
+- **Brand-row button** — a refresh glyph next to the wordmark. Click it, confirm, and
+  the whole application restarts: the window disappears, comes back by itself, is
+  brought to the foreground, and the page reloads.
 - **Agent / script route** — `POST /dsh-restart-button/restart`, so an agent can
   restart the app without asking you to click anything.
 
