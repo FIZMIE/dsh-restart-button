@@ -1,0 +1,5 @@
+# The plugin regenerates these at runtime, but they are also produced by
+# `npm run check` for validation.
+.check-artifacts/
+node_modules/
+*.log

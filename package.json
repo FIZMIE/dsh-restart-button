@@ -1,0 +1,67 @@
+{
+  "name": "dsh-restart-button",
+  "version": "1.0.0",
+  "description": "One-click restart for the DeepSeek Harness desktop app: a button beside the sidebar brand, plus an agent-callable restart route.",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FIZMIE/dsh-restart-button.git"
+  },
+  "bugs": {
+    "url": "https://github.com/FIZMIE/dsh-restart-button/issues"
+  },
+  "homepage": "https://github.com/FIZMIE/dsh-restart-button#readme",
+  "author": "FIZMIE",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./client/client.js",
+    "./package.json": "./package.json",
+    "./cordis.patch.yml": "./cordis.patch.yml"
+  },
+  "files": [
+    "lib",
+    "client",
+    "cordis.patch.yml",
+    "tools",
+    "README.md",
+    "README.zh.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-primitives"
+      ]
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=22.6"
+  },
+  "keywords": [
+    "deepseek",
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "cordis",
+    "restart",
+    "windows",
+    "electron"
+  ],
+  "scripts": {
+    "check": "node tools/extract-helper.mjs . .check-artifacts"
+  }
+}
